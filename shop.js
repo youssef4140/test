@@ -1,3 +1,41 @@
+
+
+fetch ("http://localhost:5000/api/categories/")
+  .then((res) => res.json())
+  .then((body) => body.data)
+  .then((data) => {
+    localStorage.setItem("categories", JSON.stringify(data));
+  });
+
+  // console.log(localStorage.getItem("categories"));
+
+  const categories = localStorage.getItem("categories");
+
+  const cat = JSON.parse(categories);
+
+
+function renderCategories(categoriesData) {
+    let cathtml=``;
+        for(let i = 0; i < categoriesData.length; i++ ){
+          const category = categoriesData[i];
+
+            cathtml+=`
+            <a href="" class="nav-item nav-link">${category.name}</a>
+            `;
+        }
+    document.getElementById("cat-menu").innerHTML=cathtml;
+}
+
+renderCategories(cat);
+
+
+
+
+
+
+
+
+
 fetch("http://localhost:5000/api/products")
   .then((res) => res.json())
   .then((body) => body.data)
@@ -5,14 +43,21 @@ fetch("http://localhost:5000/api/products")
     localStorage.setItem("products", JSON.stringify(data));
   });
 const products = localStorage.getItem("products");
-console.log(typeof products);
+// console.log(typeof products);
 const aaa = JSON.parse(products);
-console.log(aaa);
+// console.log(aaa);
+const cartItems = []
+
+function addToCart(product){
+  console.log(product);  
+}
 
 function renderProducts(productsData) {
   let productHTML = "";
   for (let i = 0; i < productsData.length; i++) {
     const product = productsData[i];
+    // const cartproduct = JSON.stringify(productsData[i]);
+    // console.log(i, JSON.stringify(product))
     productHTML += `
         <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
           <div class="product-item bg-light mb-4">
@@ -21,8 +66,8 @@ function renderProducts(productsData) {
       product.name
     }">
               <div class="product-action">
-                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                <a class="btn btn-outline-dark btn-square" onclick="addToCart('${product}')"><i class="fa fa-shopping-cart"></i></a>
+                <a class="btn btn-outline-dark btn-square"><i class="far fa-heart"></i></a>
                 <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
                 <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
               </div>
@@ -88,9 +133,8 @@ sortRating.addEventListener("click", sortByRating);
 //filter
 
 const arrProducts = JSON.parse(products);
-console.log(arrProducts)
-console.log(typeof arrProducts)
-
+// console.log(arrProducts);
+// console.log(typeof arrProducts);
 
 const priceCheckboxes = {
   all: document.getElementById("price-all"),
@@ -98,13 +142,12 @@ const priceCheckboxes = {
   range2: document.getElementById("price-2"),
   range3: document.getElementById("price-3"),
   range4: document.getElementById("price-4"),
-  range5: document.getElementById("price-5")
+  range5: document.getElementById("price-5"),
 };
 
 for (let range in priceCheckboxes) {
   priceCheckboxes[range].addEventListener("change", updateFilteredProducts);
-};
-
+}
 
 const colorCheckboxes = {
   all: document.getElementById("color-all"),
@@ -112,12 +155,12 @@ const colorCheckboxes = {
   color2: document.getElementById("color-2"),
   color3: document.getElementById("color-3"),
   color4: document.getElementById("color-4"),
-  color5: document.getElementById("color-5")
+  color5: document.getElementById("color-5"),
 };
 
 for (let color in colorCheckboxes) {
   colorCheckboxes[color].addEventListener("change", updateFilteredProducts);
-};
+}
 
 const sizeCheckboxes = {
   all: document.getElementById("size-all"),
@@ -125,44 +168,47 @@ const sizeCheckboxes = {
   size2: document.getElementById("size-2"),
   size3: document.getElementById("size-3"),
   size4: document.getElementById("size-4"),
-  size5: document.getElementById("size-5")
+  size5: document.getElementById("size-5"),
 };
 
 for (let size in sizeCheckboxes) {
   sizeCheckboxes[size].addEventListener("change", updateFilteredProducts);
-};
+}
 
 function updateFilteredProducts() {
+  // filter by price
+  let selectedPriceRanges = [];
+
   
 
-  // filter by price
-  const selectedPriceRanges = []; 
-
   if (priceCheckboxes.all.checked) {
-    selectedPriceRanges.push([0,500]);
+    selectedPriceRanges.push([0, 1000000000000]);
   } else {
     if (priceCheckboxes.range1.checked) {
-      selectedPriceRanges.push([0,100]);
+      selectedPriceRanges.push([0, 100]);
     }
     if (priceCheckboxes.range2.checked) {
-      selectedPriceRanges.push([100,200]);
+      selectedPriceRanges.push([100, 200]);
     }
     if (priceCheckboxes.range3.checked) {
-      selectedPriceRanges.push([200,300]);
+      selectedPriceRanges.push([200, 300]);
     }
     if (priceCheckboxes.range4.checked) {
-      selectedPriceRanges.push([300,400]);
+      selectedPriceRanges.push([300, 400]);
     }
     if (priceCheckboxes.range5.checked) {
-      selectedPriceRanges.push([400,500]);
+      selectedPriceRanges.push([400, 500]);
     }
+
   }
 
+  
+
   // by color
-  const selectedColors = []; 
+  const selectedColors = [];
 
   if (colorCheckboxes.all.checked) {
-    selectedColors.push("all color");
+    selectedColors.push("black", "white", "red", "green", "blue");
   } else {
     if (colorCheckboxes.color1.checked) {
       selectedColors.push("black");
@@ -182,10 +228,10 @@ function updateFilteredProducts() {
   }
 
   //by size
-  const selectedSizes = []; 
+  const selectedSizes = [];
 
   if (sizeCheckboxes.all.checked) {
-    selectedSizes.push("all size");
+    selectedSizes.push("xs", "s", "m", "l", "xl");
   } else {
     if (sizeCheckboxes.size1.checked) {
       selectedSizes.push("xs");
@@ -205,47 +251,51 @@ function updateFilteredProducts() {
   }
 
 
-  // const filteredProducts = arrProducts.filter(product => {
-  //   const color = product.color
-  //   for (let i =0; i < selectedColors.length; i++) {
-  //     if (color == selectedColors[i]) {
-  //       return true;
-  //     }
-  //   }
 
-    // const filteredProducts = arrProducts.filter(product => {
-    //   const size = product.size
-    //   for (let i =0; i < selectedSizes.length; i++) {
-    //     if (size == selectedSizes[i]) {
-    //       return true;
-    //     }
-    //   }
+  
+    const filteredProducts1 = arrProducts.filter((product) => {
+      const price = product.price;
+
+      for (let i = 0; i < selectedPriceRanges.length; i++) {
+        const lowerBound = selectedPriceRanges[i][0];
+        const upperBound = selectedPriceRanges[i][1];
+        if (price >= parseInt(lowerBound) && price <= parseInt(upperBound)) {
+          return true;
+        }
+      }
+    });
+
+    const filteredProducts = [];
+
+    filteredProducts1.forEach((product) => {
+      selectedColors.forEach((color2) => {
+        const color = product.color;
+        if (color == color2) {
+          selectedSizes.forEach((size2) => {
+            const size = product.size;
+            if (size == size2) {
+              filteredProducts.push(product);
+            }
+          });
+        }
+      });
+    });
+
+    
+
+
+    renderProducts(filteredProducts);
+  }
 
 
 
 
-  const filteredProducts = arrProducts.filter(product => {
-    const price = product.price;
-    const color = product.color;
-    const size = product.size;
-    for (let i = 0; i < selectedPriceRanges.length; i++) {
-      const lowerBound = selectedPriceRanges[i][0];
-      const upperBound = selectedPriceRanges[i][1];
-      if (price >= parseInt(lowerBound) && price <= parseInt(upperBound)) {
-        return true;
-      } 
-    }
 
-
-  });
 
 
   
+
+
+
+
   
-
-
-
-
-
-  renderProducts(filteredProducts);
-}
